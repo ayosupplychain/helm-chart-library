@@ -47,6 +47,8 @@ jobs:
           done
 
       - name: Create GitHub Release for each Helm chart
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd packages
           for package in *.tgz; do
