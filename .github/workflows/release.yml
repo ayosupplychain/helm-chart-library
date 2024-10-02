@@ -28,6 +28,8 @@ jobs:
           done
 
       - name: Publish Helm charts to GitHub Packages
+        env:
+          HELM_EXPERIMENTAL_OCI: 1
         run: |
           cd packages
           for package in *.tgz; do
