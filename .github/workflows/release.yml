@@ -8,6 +8,10 @@ on:
 permissions:
   packages: write
   contents: read
+  attestations: write
+  id-token: write
+  security-events: write
+  actions: read
 
 jobs:
   release:
@@ -36,7 +40,7 @@ jobs:
           HELM_EXPERIMENTAL_OCI: 1
           HELM_REGISTRY_CONFIG: /home/runner/.config/helm/registry.json
         run: |
-          echo ${{ secrets.GHCR_TOKEN }} | helm registry login -u ${{ github.actor }} --password-stdin ghcr.io
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u ${{ github.actor }} --password-stdin ghcr.io
           cd packages
           for package in *.tgz; do
             helm push "$package" oci://ghcr.io/${{ github.repository_owner }}/charts
