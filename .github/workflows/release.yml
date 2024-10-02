@@ -34,15 +34,15 @@ jobs:
         run: |
           cd packages
           for package in *.tgz; do
-        helm push "$package" oci://ghcr.io/${{ github.repository_owner }}/charts
+            helm push "$package" oci://ghcr.io/${{ github.repository_owner }}/charts
           done
 
       - name: Create GitHub Release for each Helm chart
         run: |
           cd packages
           for package in *.tgz; do
-        chart_name=$(helm show chart "$package" | grep '^name:' | awk '{print $2}')
-        release_version=$(helm show chart "$package" | grep '^version:' | awk '{print $2}')
-        release_name="${chart_name}-${release_version}"
-        gh release create "$release_name" "$package" --title "$chart_name" --notes "Release of $chart_name version $release_version"
+            chart_name=$(helm show chart "$package" | grep '^name:' | awk '{print $2}')
+            release_version=$(helm show chart "$package" | grep '^version:' | awk '{print $2}')
+            release_name="${chart_name}-${release_version}"
+            gh release create "$release_name" "$package" --title "$chart_name" --notes "Release of $chart_name version $release_version"
           done
