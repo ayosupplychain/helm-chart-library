@@ -1,0 +1,48 @@
+name: Release Helm Charts
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: '3'
+
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh-cli@v1
+
+      - name: Package Helm charts
+        run: |
+          cd charts
+          mkdir -p ../packages
+          for chart in */Chart.yaml; do
+        chart_dir=$(dirname "$chart")
+        helm package "$chart_dir" --destination ../packages
+          done
+
+      - name: Publish Helm charts to GitHub Packages
+        run: |
+          cd packages
+          for package in *.tgz; do
+        helm push "$package" oci://ghcr.io/${{ github.repository_owner }}/charts
+          done
+
+      - name: Create GitHub Release for each Helm chart
+        run: |
+          cd packages
+          for package in *.tgz; do
+        chart_name=$(helm show chart "$package" | grep '^name:' | awk '{print $2}')
+        release_version=$(helm show chart "$package" | grep '^version:' | awk '{print $2}')
+        release_name="${chart_name}-${release_version}"
+        gh release create "$release_name" "$package" --title "$chart_name" --notes "Release of $chart_name version $release_version"
+          done
