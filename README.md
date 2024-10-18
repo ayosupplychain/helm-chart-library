@@ -1,4 +1,4 @@
-# Helm Charts Repository
+# Helm Charts Repository 🚀
 
 This repository contains multiple sample Helm charts.
 
